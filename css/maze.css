@@ -1,0 +1,28 @@
+.sidebar{font-size: .7rem;}
+.col-text-center{text-align: center;}
+
+table td{
+	height: 34px;
+	text-align: center;
+}
+button{}
+html{
+	font-family: Verdana, Geneva, sans-serif;
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%
+}
+body{margin:0;
+background-image: url(../image/bg.jpg);
+	background-repeat: repeat-y;
+	background-position: center;}
+article,aside,footer,header,nav,section{display:block}h1{font-size:2em;margin:.67em 0}
+
+a{text-decoration:none;}
+
+
+
+a:hover{
+	color: red;
+	
+	
+}

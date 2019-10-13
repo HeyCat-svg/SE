@@ -1,14 +1,82 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Maze</title>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>menu</title>
         <script src="maze.js"></script>
-        <link type="text/css" rel="stylesheet" href="maze.css"></link>
-    </head>
-    <body onload="init()">
-        <div id="maze">
-            <p>Maze Game</p>
-        </div>
-    </body>
+<link href="css/maze.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body  onload="init()">
+<center>
+
+
+    <iframe src="menu.html"  width="1000" height="200" scrolling="no" frameborder="0" ></iframe>
+
+  <table width="1002" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><table width="1002" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td>&nbsp;</td>
+        <td width="400px">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+  <td> <span class="input-group-addon addon-sm">MazeType:</span></td>
+    <td> 
+                                        <select id="sltType" class="form-select select-sm" onchange="onSltType()">
+                                            <option>Maze1</option>
+                                            <option>Maze2</option>
+                                        </select></td>
+  </tr>
+  <tr> <td>Animated:</td>
+    <td><label class="form-checkbox input-sm">
+                                            <input id="chkAnimated" type="checkbox" class="input-sm" name="maze" checked>
+                                        </label></td>
+  </tr>
+  <tr> <td><span class="input-group-addon addon-sm">Columns:</span></td>
+    <td> 
+                                        <input id="cols" class="form-input input-sm" type="number" placeholder="90" value="90"></td>
+  </tr>
+  <tr> <td><span class="input-group-addon addon-sm">Rows:</span></td>
+    <td> 
+                                        <input id="rows" class="form-input input-sm" type="number" placeholder="30" value="30"></td>
+  </tr>
+  <tr> <td> <span class="input-group-addon addon-sm">Density:</span></td>
+    <td>
+                                        <input id="density" class="form-input input-sm" type="number" placeholder="60" value="60" disabled></td>
+  </tr>
+    <tr>
+  <td> <span class="input-group-addon addon-sm">SearchType:</span></td>
+    <td> 
+                                        <select id="schType" class="form-select select-sm" onchange="onSltType()">
+                                            <option>auto</option>
+                                            <option>DFS</option>
+                                            <option>A*</option>
+                                            <option>LCA</option>
+                                        </select></td>
+  </tr>
+  <tr> <td></td>
+    <td> <button id="btnCreateMaze" class="btn btn-sm input-group-btn" onclick="onCreate()">Create</button></td>
+  </tr>
+</table>
+       
+		</td>
+        <td ><div id="description">description</div></td>
+        <td>&nbsp;</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td><div id="maze" ></div></td>
+  </tr>
+  <tr>
+    <td><div id="output"></div></td>
+  </tr>
+  <tr>
+    <td>
+    <iframe src="bottom.html"  width="1000" height="200" scrolling="no" frameborder="0" ></iframe></td>
+  </tr>
+</table>
+</center>
+</body>
 </html>
