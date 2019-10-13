@@ -30,7 +30,7 @@
   </tr>
   <tr> <td>Animated:</td>
     <td><label class="form-checkbox input-sm">
-                                            <input id="chkAnimated" type="checkbox" class="input-sm" name="maze" checked>
+                                            <input id="chkAnimated" type="checkbox" class="input-sm" name="maze" >
                                         </label></td>
   </tr>
   <tr> <td><span class="input-group-addon addon-sm">Columns:</span></td>
@@ -49,14 +49,13 @@
   <td> <span class="input-group-addon addon-sm">SearchType:</span></td>
     <td> 
                                         <select id="schType" class="form-select select-sm" onchange="onSltType()">
-                                            <option>auto</option>
                                             <option>DFS</option>
                                             <option>A*</option>
                                             <option>LCA</option>
                                         </select></td>
   </tr>
-  <tr> <td></td>
-    <td> <button id="btnCreateMaze" class="btn btn-sm input-group-btn" onclick="onCreate()">Create</button></td>
+  <tr> <td><button id="btnCreateMaze" class="btn btn-sm input-group-btn" onclick="onCreate()">生成迷宫</button></td></td>
+    <td> <button id="btnMazeClear" class="btn btn-sm input-group-btn" onclick="maze_clear()" disabled="disabled">清空路径</button></td>
   </tr>
 </table>
        

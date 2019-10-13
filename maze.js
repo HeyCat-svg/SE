@@ -1,5 +1,5 @@
 var ctx, wid, hei, cols, rows, maze, stack = [], start = {x:-1, y:-1}, end = {x:-1, y:-1}, grid = 8, padding =0, s, density=0.5;
-
+var maxheap;
 var startA = {point:start,weight:-1,length:0},endA = {point:end,weight:-1,length:-1};
 var startL = start,endL = end,startT = start,endT = end;
 var mazeDir,mazePointer;
@@ -85,7 +85,7 @@ function MaxHeap(initDataArray, maxSize = 9999) {
     }
 
     /**
-     * 移除根元素，并返回根元素数据
+     * @description 移除根元素，并返回根元素数据
      *
      * @returns {*} data 根元素的数据值
      */
@@ -106,6 +106,7 @@ function MaxHeap(initDataArray, maxSize = 9999) {
 function drawMaze() {
     for( var i = 0; i < cols; i++ ) {
         for( var j = 0; j < rows; j++ ) {
+            /*
             switch( maze[i][j] ) {
                 case 0: ctx.fillStyle = "black"; break;
                 case 1: ctx.fillStyle = "gray"; break;
@@ -115,10 +116,18 @@ function drawMaze() {
                 case 8: ctx.fillStyle = "blue"; break;
             }
             ctx.fillRect( grid * i, grid * j, grid, grid  );
+            ctx.strokeStyle = ctx.fillStyle;
+            ctx.strokeRect( grid * i, grid * i, grid, grid  );*/
+            drawBlock(i,j,maze[i][j]);
         }
     }
 }
-
+/**
+ * @description draw (sx sy) block in type a 
+ * @param {*} sx x in coordinate
+ * @param {*} sy y in coordinate
+ * @param {*} a block type
+ */
 function drawBlock(sx, sy, a) {
     switch( a ) {
         case 0: ctx.fillStyle = "black"; break;
@@ -129,6 +138,8 @@ function drawBlock(sx, sy, a) {
         case 8: ctx.fillStyle = "blue"; break;
     }
     ctx.fillRect( grid * sx, grid * sy, grid, grid  );
+    ctx.strokeStyle = ctx.fillStyle;
+    ctx.strokeRect( grid * sx+0.5, grid * sy+0.5, grid, grid  );
 }
 
 function getFNeighbours( sx, sy, a ) {
@@ -147,6 +158,45 @@ function getFNeighbours( sx, sy, a ) {
     }
     return n;
 }
+function startSolve()
+{
+    document.getElementById("btnCreateMaze").setAttribute("disabled", "disabled");
+    document.getElementById("output").innerHTML = "output:<br />";
+    var searchType = document.getElementById("schType").value;
+    //console.log
+    if(searchType == "DFS")
+    {
+        solveMaze1();
+    }
+    if(searchType == "A*")
+    {
+        Alength = 0;
+        startA = {point:Object.create(start),weight:Math.abs(start.x-end.x)+Math.abs(start.y-end.y),length:0};
+        endA = {point:Object.create(end),weight:0,length:Math.abs(start.x-end.x)+Math.abs(start.y-end.y)};
+        //console.log('start A*');
+        maxheap = new MaxHeap();
+        mazePointer_clear();
+        solveMaze_A();
+    }
+    if(searchType == "LCA")
+    {
+        LCAlength = 0;
+        
+        startL =Object.create(start);
+        startT =Object.create(start);
+        endL = Object.create(end);
+        endT = Object.create(end);
+        solveMaze_LCA();
+    }
+
+
+   
+
+   //console.log('start LCA');
+  // 
+
+
+}
 function solveMaze1() {
     if( start.x == end.x && start.y == end.y ) {
         for( var i = 0; i < cols; i++ ) {
@@ -157,7 +207,10 @@ function solveMaze1() {
                 }
             }
         }
-        drawMaze();
+        document.getElementById("btnMazeClear").removeAttribute("disabled");
+        document.getElementById("output").innerHTML += "search end";
+        document.getElementById("btnCreateMaze").removeAttribute("disabled");
+        drawMaze();stack = [];
         return;
     }
     var neighbours = getFNeighbours( start.x, start.y, 0 );
@@ -165,14 +218,135 @@ function solveMaze1() {
         stack.push( start );
         start = neighbours[0];
         maze[start.x][start.y] = 2;
+        drawBlock(start.x,start.y,2);
     } else {
         maze[start.x][start.y] = 4;
+        drawBlock(start.x,start.y,4);
         start = stack.pop();
     }
  
-    drawMaze();
+   // drawMaze();
     requestAnimationFrame( solveMaze1 );
 }
+
+function mazePointer_clear(){
+    for( var i = 0; i < cols; i++ ) {
+        for( var j = 0; j < rows; j++ ) {
+            mazePointer[i][j] = undefined;
+        }
+    }
+}
+function solveMaze_A(){
+    if( startA.point.x == endA.point.x && startA.point.y == endA.point.y ) {
+
+     //   console.log('length',startA.length);
+      //  console.log('A* search length',Alength);
+        for( var i = 0; i < cols; i++ ) {
+            for( var j = 0; j < rows; j++ ) {
+                switch( maze[i][j] ) {
+                    case 2: maze[i][j] = 0; break;
+                    case 4: maze[i][j] = 0; break;
+                }
+            }
+        }
+        while(mazePointer[endA.point.x][endA.point.y])
+        {
+            maze[endA.point.x][endA.point.y] = 3;
+            console.log(endA.point.x,endA.point.y);
+            endA.point =Object.create(mazePointer[endA.point.x][endA.point.y]);
+        }
+        maze[endA.point.x][endA.point.y] = 3;
+        document.getElementById("btnMazeClear").removeAttribute("disabled");
+        document.getElementById("output").innerHTML += "search end";
+        document.getElementById("btnCreateMaze").removeAttribute("disabled");
+        drawMaze();
+        //console.log('start dfs');
+       // dfslength = 0;
+      //  maze_clear();
+        //solveMaze();
+        return;
+    }
+    var neighbours = getFNeighbours( startA.point.x, startA.point.y, 0 );
+   // console.log('neighboursLength', neighbours.length );
+    if( neighbours.length ) {
+      //  console.log('infor');
+        for(var i=0;i< neighbours.length;++i)
+        {
+
+            var nowPointA = {point: Object.create(neighbours[i]),weight:0,length:startA.length+1};
+            nowPointA.weight =  nowPointA.length+Math.abs(nowPointA.point.x-endA.point.x)+Math.abs(nowPointA.point.y-endA.point.y);
+           // if(maxheap.isinList(nowPointA))
+             //  
+            maxheap.insert(nowPointA);
+            mazePointer[nowPointA.point.x][nowPointA.point.y] = {x:startA.point.x,y:startA.point.y};
+
+        }
+    }
+
+    maze[startA.point.x][startA.point.y] = 2;
+    drawBlock(startA.point.x,startA.point.y,2);
+    startA = maxheap.removeRoot();
+    ++Alength;
+   // drawMaze();
+    requestAnimationFrame( solveMaze_A );
+}
+function solveMaze_LCA()
+{
+    if( (mazeDir[startL.x][startL.y]!=undefined && maze[startL.x][startL.y ]==2 )||( mazeDir[endL.x][endL.y]!=undefined && maze[endL.x][endL.y] == 2 )) {
+        var middlePoint;
+        if(mazeDir[startL.x][startL.y]!=undefined && maze[startL.x][startL.y ]==2)
+            middlePoint = startL;
+        else
+            middlePoint = endL;
+        maze_clear();
+        startL = Object.create(startT);
+        endL = Object.create(endT);
+
+        maze[startL.x][startL.y] = 3;
+        maze[endL.x][endL.y] = 3;
+
+        while(mazeDir[startL.x][startL.y]!=undefined && (startL.x!=middlePoint.x ||startL.y!=middlePoint.y))//
+        {
+            maze[startL.x][startL.y] = 3;
+            startL = mazeDir[startL.x][startL.y];
+        }
+        while(mazeDir[endL.x][endL.y]!=undefined &&( endL.x!=middlePoint.x ||endL.y!=middlePoint.y))//mazeDir[endL.x][endL.y]!=undefined &&
+        {
+            maze[endL.x][endL.y] = 3;
+            endL = mazeDir[endL.x][endL.y];
+
+        }
+        maze[middlePoint.x][middlePoint.y] = 3;
+
+       // console.log('LCA search length',LCAlength);
+       document.getElementById("btnMazeClear").removeAttribute("disabled");
+       document.getElementById("output").innerHTML += "search end";
+       document.getElementById("btnCreateMaze").removeAttribute("disabled");
+        drawMaze();
+        return;
+    }
+    var l;
+    maze[startL.x][startL.y] = 2;
+    drawBlock(startL.x,startL.y,2);
+    maze[endL.x][endL.y] = 2;
+    drawBlock(endL.x,endL.y,2);
+    if(mazeDir[startL.x][startL.y]!=undefined)
+    {
+
+        startL = mazeDir[startL.x][startL.y];
+       // console.log("startL",startL.x,startL.y);
+        ++LCAlength;
+    }
+    if(mazeDir[endL.x][endL.y]!=undefined)
+    {
+        endL = mazeDir[endL.x][endL.y];
+      //  console.log("endL",endL.x,endL.y);
+        ++LCAlength;
+    }
+    //drawMaze();
+    requestAnimationFrame( solveMaze_LCA );
+}
+// listen to mouseclick to start solving maze; type 8:start/end point in maze
 function getCursorPos( event ) {
     var rect = this.getBoundingClientRect();
     var x = Math.floor( ( event.clientX - rect.left ) / grid / s), 
@@ -181,11 +355,12 @@ function getCursorPos( event ) {
     if( start.x == -1 ) {
         start = { x: x, y: y };
         maze[start.x][start.y] = 8;
-        drawMaze();
+        drawBlock(start.x,start.y,8);
     } else {
         end = { x: x, y: y };
         maze[end.x][end.y] = 8;
-        solveMaze1();
+        drawBlock(end.x,end.y,8);
+        startSolve();
     }
 }
 function getNeighbours( sx, sy, a ) {
@@ -214,6 +389,20 @@ function createArray( c, r ) {
     }
     return m;
 }
+/**
+ * @description clear the path in the maze
+ */
+function maze_clear()
+{
+    for( var i = 0; i < cols; i++ ) {
+        for( var j = 0; j < rows; j++ ) {
+            if(maze[i][j]==3||maze[i][j]==2||maze[i][j]==8)
+                maze[i][j]= 0;
+        }
+    }
+    start = {x:-1,y:-1};
+    drawMaze();
+}
 function createMaze1() {
     var neighbours = getNeighbours( start.x, start.y, 1 ), l;
     if( neighbours.length < 1 ) {
@@ -230,10 +419,12 @@ function createMaze1() {
         var i = 2 * Math.floor( Math.random() * ( neighbours.length / 2 ) )
         l = neighbours[i]; 
         maze[l.x][l.y] = 0;
-
+        mazeDir[l.x][l.y] = {x:start.x,y:start.y};
+       // drawBlock(l.x,l.y,0);
         l = neighbours[i + 1]; 
         maze[l.x][l.y] = 0;
-
+        mazeDir[l.x][l.y] = {x:neighbours[i].x,y:neighbours[i].y};
+       // drawBlock(l.x,l.y,0);
         start = l
         stack.push( start )
     }
@@ -260,10 +451,12 @@ function createMaze1NonAni() {
             var i = 2 * Math.floor( Math.random() * ( neighbours.length / 2 ) )
             l = neighbours[i]; 
             maze[l.x][l.y] = 0;
-    
+            mazeDir[l.x][l.y] = {x:start.x,y:start.y};
+
             l = neighbours[i + 1]; 
             maze[l.x][l.y] = 0;
-    
+            mazeDir[l.x][l.y] = {x:neighbours[i].x,y:neighbours[i].y};
+
             start = l
             stack.push( start )
         }    
@@ -304,6 +497,9 @@ function createMaze2NonAni() {
     }
     document.getElementById("btnCreateMaze").removeAttribute("disabled");
 }
+/**  
+ * @description createCanvas
+ * */
 function createCanvas() {
     var canvas = document.createElement( "canvas" );
     wid = document.getElementById("maze").offsetWidth - padding; 
@@ -316,7 +512,7 @@ function createCanvas() {
     var div = document.getElementById("maze")
     div.appendChild( canvas ); 
 }
-
+// function onload
 function init() {
     createCanvas();
 }
@@ -340,7 +536,9 @@ function onCreate() {
     }
 
     maze = createArray( cols, rows );
-
+    mazePointer = createArray( cols, rows );
+    mazeDir = createArray( cols, rows );
+    
     var canvas = document.getElementById("canvas");
     canvas.width = wid;
     canvas.height = hei;
@@ -349,14 +547,14 @@ function onCreate() {
 
     ctx.scale(s, s);
 
- 
+    drawMaze();
     if(mazeType == "Maze1") {
 
         start.x = Math.floor( Math.random() * ( cols / 2 ) );
         start.y = Math.floor( Math.random() * ( rows / 2 ) );
         if( !( start.x & 1 ) ) start.x++; if( !( start.y & 1 ) ) start.y++;
         maze[start.x][start.y] = 0;
-
+        mazeDir[start.x][start.y] = undefined;
         if(document.getElementById("chkAnimated").checked) {
 
             createMaze1();
@@ -382,11 +580,13 @@ function onCreate() {
         }
     }
 }
-// alter the options due to the mazetype
+/**
+ * @description alter the options due to the mazetype
+*/
 function onSltType() {
     if(document.getElementById("sltType").value == "Maze2") {
         document.getElementById("density").removeAttribute("disabled");
-        document.getElementById("schType").options.remove(3)
+        document.getElementById("schType").options.remove(2)
     }
     else {
         document.getElementById("density").setAttribute("disabled", "disabled");
