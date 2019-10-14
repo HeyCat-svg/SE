@@ -1,7 +1,8 @@
 # A SIMPLE MAZE IN HTML
 ## The overview of widget
-     &emsp;There is only a widget in this website which contains a maze,two input components and a button. <br> 
-     &emsp;These two input components can adjust the scale of the maze. User can input the width and height of the maze or do nothing which means maze will use the default setting of the scale of the maze.
+     There is only a widget in this website which contains a maze,two input components and a button.  
+     
+     These two input components can adjust the scale of the maze. User can input the width and height of the maze or do nothing which means maze will use the default setting of the scale of the maze.
 ## How to build a website(Code in html)
      &emsp;All the JavasCript code is from the file "maze.js". The web site just realizes the most basic function. There is actually no UI at all. 
      All the objects are crowed at the left-top site of the page.
