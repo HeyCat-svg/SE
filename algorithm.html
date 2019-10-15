@@ -12,7 +12,33 @@
    <table width="1002" border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td>&nbsp;</td>
-    <td>算法介绍</td>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0" class="tex-desc">
+  <tr>
+    <td ><p class="tex-desc">网页中一共使用了三种不同的算法对迷宫进行求解。</p></td>
+  </tr>
+  <tr>
+    <td class="tex-desc"><p><b>深度优先搜索算法（DFS）：</b></p>
+    <p>
+    这是一种非常经典而古老的算法。简洁易懂是其优点，但是DFS算法在无限大的迷宫中是非确定性的，即使在有限的迷宫中，DFS也不能保证找到最短路径。
+    </p>
+    <p>
+    DFS在此处被作为默认算法的唯一原因是其可视化真的非常好看……
+    </p></td>
+  </tr>
+  <tr>
+    <td class="tex-desc"><p><b>A*算法：</b></p>
+    <p>
+    一种非常经典的元启发式算法，同时结合了迪杰斯特拉算法和贪心算法的优点。算法核心是在寻路时对此刻距离终点的距离进行估计，从而做出选择。在动画演示中可以非常明显地看到其威力。</p></td>
+  </tr>
+  <tr>
+    <td class="tex-desc"><p ><b>最近公共祖先算法：</b></p>
+    <p>
+    <p>
+    最近公共祖先算法仅适用于单连通地图，在把单连通地图视作一棵树的情况下，寻找两点之间的路径就等效于寻找两个节点的公共祖先。因此LCA算法在一个给定的静态单连通地图中，表现非常优秀。
+    </p></td>
+  </tr>
+</table>
+</td>
     <td>&nbsp;</td>
   </tr>
   <tr>

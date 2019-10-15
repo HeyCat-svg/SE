@@ -142,7 +142,7 @@ function drawBlock(sx, sy, a) {
         case 0: ctx.fillStyle = "#FFFFBF"; break;
         case 1: ctx.fillStyle = "#55551C"; break;
         case 2: ctx.fillStyle = "red"; break;
-        case 3: ctx.fillStyle = "yellow"; break;
+        case 3: ctx.fillStyle = "#ffcc33"; break;
         case 4: ctx.fillStyle = "#500000"; break;
         case 8: ctx.fillStyle = "blue"; break;
     }
@@ -312,8 +312,8 @@ function solveMaze_A(){
         maze[endA.point.x][endA.point.y] = 3;
         document.getElementById("btnMazeClear").removeAttribute("disabled");
         document.getElementById("output").innerHTML = "搜索结束";
-        document.getElementById("path").innerHTML = "路径长度："+startA.length;
-        document.getElementById("searchlength").innerHTML = "搜索长度："+Alength;
+        document.getElementById("path").innerHTML = "路径长度："+startA.length.toFixed(2);
+        document.getElementById("searchlength").innerHTML = "搜索长度："+Alength.toFixed(2);
         document.getElementById("btnCreateMaze").removeAttribute("disabled");
         drawMaze();
         //console.log('start dfs');

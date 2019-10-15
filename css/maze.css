@@ -5,6 +5,10 @@ table td{
 	height: 34px;
 	text-align: center;
 }
+p{
+	text-indent: 2em;
+	text-align: left;
+}
 button{}
 html{
 	font-family: Verdana, Geneva, sans-serif;
