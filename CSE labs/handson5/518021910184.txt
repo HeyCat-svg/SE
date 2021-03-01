@@ -1,0 +1,40 @@
+Q1：Dynamo provides application with eventually consistency, can you explain why the system designers choose this consistency level?
+         (From the application requirements and system assumptions)
+A1：从应用角度来说，大部分的Amazon应用对availability的要求大于consistency，比如购物车查询服务，因此应用强调极高的availability，即使断
+        电或断网也要保证用户的request。从系统假设来看，整个系统对request有严格的响应时间的要求。如果过于注重consistency而优先处理conflict，
+        则处理conflict的这段时间内，用户请求将被搁置，这是不被允许的。又因为系统如果过于强调传统的ACID则会降低availability，所以Dynamo降
+        低对consistency的要求，以availability优先，采用eventually consistency，这样能第一时间处理用户请求而将处理conflict的时间延后，但最终
+        结果是一样的。
+
+Q2：What's the tradeoff of dynamo(CAP theorem)?
+A2：Dynamo用一部分的一致性换取可用性和分区容错性。Dynamo在断网和部分节点丢失的情况下仍能处理用户请求。它用object version标注不同版
+        本的数据。在最新版本数据不可用的情况下，Dynamo依旧接收用户的put请求，并以旧版本数据为基础向下版本递增，此时数据库是不一致的。当
+        最新版本数据可用时，再根据版本合并，形成新的版本。这种机制使得Dynamo在发生network partition情况下也能保证availability。即使中间有不
+        一致的情况发生，通过版本合并也能保证最终稿一致性。
+
+Q3：Why dynamo uses virtual nodes for data partition?
+A3：使用virtual nodes是为了考虑到不同结点的Heterogeneity。根据Dynamo的机制，hash函数所在的环形namespace中，每个节点负责存储一段区
+        间的key，而不同主机的负载不同。虚拟节点的存在使得负载能力大的主机能够同时负责多个节点，即同时存储多个区间的key，做到服务的负载均衡。
+        此外，不同主机的虚拟节点交替排列后，一个主机的崩溃能将其任务均匀的分配到与其相邻的不同主机上，减轻单个主机崩溃带来的影响。同时当加入
+        新的节点后，通过将此主机的虚拟节点均匀分布到整个namespace后，新的主机能够从原有集群中的每个节点分到相等的任务，同时均衡各主机的负载。
+
+Q4：How can deleted items resurface in a shopping cart? (introduced in Section 4.4)
+A4：因为数据在每次写之后会形成数据的一个新的版本，此版本不会影响之前的旧版本。考虑这一种情况，当一个节点收到删除购物车A项目的时候，在此
+        节点于是就生成了一个没有A的版本，在更新传播的过程中该节点崩溃了，之后对同一购物车的写操作就交给其他的replicated节点完成，但其他节点中
+         A是未删除状态，于是后续版本都是基于有A的购物车版本。在崩溃节点恢复后，两个分支按照增量合并，则原来在崩溃节点中删去的A因为其他
+         replicated节点的原因又回来了，即已被删除的物品重新出现在购物车里。
+
+Q5：How does vector clock maintain causality for R/W on data?
+A5：Vector clock即一个数组，其中包含许多的 (node, counter) 队。node代表处理数据的节点，counter表示数据在节点中的版本号。版本号是递增的，每次
+        有写操作就会加一。当一个client新增一个数据后，假定数据被Sx处理，其Vector clock为([Sx, 1])，又有写操作被Sx节点处理，则数据在Sx节点中的版本号
+        加一，Vector clock为([Sx, 2])，这样根据数据在节点中的版本号大小就能判断出数据的新旧关系。接下来有两个client同时写数据，且被不同的节点处理，此
+        时版本出现分支，当两个节点各自处理完毕后，该数据的Vector clock分别为([Sx, 2], [Sy, 1])和([Sx, 2], [Sz, 1])。因为[Sy, 1]和[Sz, 1]冲突的关系，所以能知道
+        这两组数据是从同一源[Sx, 2]分出来的两支。两个有冲突的数据再被传播到replicated节点后都被保留着。当下一次读操作发生时，Dynamo会将两个数据以及
+        Vector clock的信息都返回，并让client处理冲突。client冲突解决后返回一个新的Vector clock，其中包含着合并前两组冲突的Vector clock的所有信息。同时
+        负责存储合并后数据的节点Sx会将数据在其节点内的版本号加一，最后的Vector clock为([Sx, 3], [Sy, 1], [Sz, 1])。由此，Vector clock通过记录完成操作的节点
+        名字和对应版本号完成对数据的全程跟踪，即“maintain causality for R/W on data”。
+
+Q6：What's a gossip-based protocol?
+A6：Gossip-based protocol指的是集群中的每个节点会周期性的向其peer节点散播消息，最终使新的信息传播至集群中的每个节点。Gossip过程由种子节点发起，当
+        一个种子节点由状态需要更新到网络中的其他节点，它会随机选择周围几个节点散播消息，收到消息的节点重复该过程直至网络中所有节点都收到了消息，是一个
+        最终一致性协议。

@@ -1,0 +1,45 @@
+Question1:
+    因为创建studentB的命令没有commit，所以在recovery的过程中应该被抛弃
+
+Question2:
+    在database重启之后，studentC和studentA被激活，action 3的操作被重新执行。recovery之前
+disk里只有studentA的1000余额。recovery之后，disk里有studentA的900余额和studentC的3100余额。
+
+Question3:
+    在crash之前，action 1已经执行end操作，action 2执行了commit操作。end操作将内存数据中commit
+的内容flush到磁盘上。而commit操作只是将数据存进内存的buffer中，crash后就会丢失。因此在crash之后
+disk中只有执行过end操作的action 1在disk中有记录，而action 2和action 3都不会有记录。即disk中有
+studentA的1000余额，而没有studentC的余额。
+
+Question4:
+    "DB"中的内容为：Account: studentC Value: 3100   Account: studentA Value: 900。因为在恢复
+后，studentC和studentA的操作因为之前commit过，所以会被install到DB中。
+
+Question5;
+    database的状态符合预期，即"DB"文件和"LOG"文件没有变化。因为在上一次执行./wal-sys.py后，程序
+已经执行了recovery，然后action 3被恢复，action 2被抛弃。没有需要被recovery的命令，因此两个文件都
+不变。
+
+Question6:
+    winners表示在此次recovery中成功恢复的action，即已经commit但没有end的action。Losers表示在此次
+recovery中被抛弃的action，即没有commit的action。Done表示已经被持久化到"DB"中的action，即既commit
+过也执行过end操作的action。
+
+Question7:
+    因为执行checkpoint时，action 2还没有commit以及执行end命令，因此不会flush到磁盘上。
+
+Question8:
+    日志回滚了6行，使用checkpoint的好处就是不用遍历全部日志，这样使得日志量增加时，回滚的行数始终是一个
+较小的值，减少了recovery操作的时间。
+
+Question9:
+    第二次运行recovery得到的"DB"文件和第一次运行recovery是一样的。这种性质叫幂等性。
+
+Question10:
+    程序是根据action是否执行过end操作来决定action是否完成。在第一次recovery前，action 3没有end操作，
+因此执行redo操作，并在LOG文件中加入关于action 3的end语句。第二次recovery时，action 3已经执行过end操作，
+因此被分在了done一列。而action 2由于没有commit，则被分在了Losers一列。
+
+Question11:
+    用undo选项执行sequence 2后，原本没有commit的action 2也被写入disk当中。根据undo选项的解释和执行结果，
+我猜测undo选项是禁用日志和恢复选项，将每步写操作直接作用到磁盘，所以action 2也会留下记录。

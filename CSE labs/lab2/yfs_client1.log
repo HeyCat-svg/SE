@@ -1,0 +1,111 @@
+FUSE library version: 2.9.4
+unique: 1, opcode: INIT (26), nodeid: 0, insize: 56, pid: 0
+INIT: 7.27
+flags=0x003ffffb
+max_readahead=0x00020000
+   INIT: 7.19
+   flags=0x00000000
+   max_readahead=0x00020000
+   max_write=0x00020000
+   max_background=0
+   congestion_threshold=0
+   unique: 1, success, outsize: 40
+unique: 2, opcode: LOOKUP (1), nodeid: 1, insize: 97, pid: 824
+   unique: 2, error: -2 (No such file or directory), outsize: 16
+unique: 3, opcode: CREATE (35), nodeid: 1, insize: 113, pid: 824
+getattr 00007fff5f4c9a10 0
+getfile 00007fff5f4c9a10
+getfile 00007fff5f4c9a10 -> sz 1958600720
+   getattr -> 1958600720
+   unique: 3, success, outsize: 160
+OK: create returns.
+unique: 4, opcode: LOOKUP (1), nodeid: 1, insize: 45, pid: 836
+   unique: 4, error: -2 (No such file or directory), outsize: 16
+unique: 5, opcode: CREATE (35), nodeid: 1, insize: 61, pid: 836
+getattr 00007fff5f4c9a10 0
+getfile 00007fff5f4c9a10
+getfile 00007fff5f4c9a10 -> sz 31097232
+   getattr -> 31097232
+   unique: 5, success, outsize: 160
+OK: create returns.
+unique: 6, opcode: LOOKUP (1), nodeid: 1, insize: 45, pid: 848
+   unique: 6, error: -2 (No such file or directory), outsize: 16
+unique: 7, opcode: MKDIR (9), nodeid: 1, insize: 53, pid: 848
+getattr 0000003000000030 0
+getfile 0000003000000030
+getfile 0000003000000030 -> sz 31097232
+   getattr -> 31097232
+   unique: 7, success, outsize: 144
+unique: 8, opcode: LOOKUP (1), nodeid: 1, insize: 46, pid: 861
+   unique: 8, error: -2 (No such file or directory), outsize: 16
+unique: 9, opcode: LOOKUP (1), nodeid: 1, insize: 46, pid: 861
+   unique: 9, error: -2 (No such file or directory), outsize: 16
+unique: 10, opcode: LOOKUP (1), nodeid: 1, insize: 54, pid: 861
+   unique: 10, error: -2 (No such file or directory), outsize: 16
+unique: 11, opcode: LOOKUP (1), nodeid: 1, insize: 54, pid: 861
+   unique: 11, error: -2 (No such file or directory), outsize: 16
+unique: 12, opcode: LOOKUP (1), nodeid: 1, insize: 51, pid: 861
+   unique: 12, error: -2 (No such file or directory), outsize: 16
+unique: 13, opcode: LOOKUP (1), nodeid: 1, insize: 51, pid: 861
+   unique: 13, error: -2 (No such file or directory), outsize: 16
+unique: 14, opcode: LOOKUP (1), nodeid: 1, insize: 52, pid: 861
+   unique: 14, error: -2 (No such file or directory), outsize: 16
+unique: 15, opcode: LOOKUP (1), nodeid: 1, insize: 52, pid: 861
+   unique: 15, error: -2 (No such file or directory), outsize: 16
+unique: 16, opcode: LOOKUP (1), nodeid: 1, insize: 46, pid: 862
+   unique: 16, error: -2 (No such file or directory), outsize: 16
+unique: 17, opcode: LOOKUP (1), nodeid: 1, insize: 46, pid: 862
+   unique: 17, error: -2 (No such file or directory), outsize: 16
+unique: 18, opcode: SYMLINK (6), nodeid: 1, insize: 57, pid: 862
+getattr 0000000000000000 0
+getfile 0000000000000000
+getfile 0000000000000000 -> sz 1958600760
+   getattr -> 1958600760
+   unique: 18, success, outsize: 144
+unique: 19, opcode: LOOKUP (1), nodeid: 1, insize: 46, pid: 863
+   unique: 19, error: -2 (No such file or directory), outsize: 16
+unique: 20, opcode: LOOKUP (1), nodeid: 1, insize: 53, pid: 890
+   unique: 20, error: -2 (No such file or directory), outsize: 16
+unique: 21, opcode: CREATE (35), nodeid: 1, insize: 69, pid: 890
+getattr 00007fff5f4c9a10 0
+getfile 00007fff5f4c9a10
+getfile 00007fff5f4c9a10 -> sz 31097232
+   getattr -> 31097232
+   unique: 21, success, outsize: 160
+OK: create returns.
+unique: 22, opcode: LOOKUP (1), nodeid: 1, insize: 53, pid: 890
+   unique: 22, error: -2 (No such file or directory), outsize: 16
+unique: 23, opcode: CREATE (35), nodeid: 1, insize: 69, pid: 890
+getattr 00007fff5f4c9a10 0
+getfile 00007fff5f4c9a10
+getfile 00007fff5f4c9a10 -> sz 31097232
+   getattr -> 31097232
+   unique: 23, success, outsize: 160
+OK: create returns.
+unique: 24, opcode: LOOKUP (1), nodeid: 1, insize: 53, pid: 891
+   unique: 24, error: -2 (No such file or directory), outsize: 16
+unique: 25, opcode: LOOKUP (1), nodeid: 1, insize: 45, pid: 916
+   unique: 25, error: -2 (No such file or directory), outsize: 16
+unique: 26, opcode: MKDIR (9), nodeid: 1, insize: 53, pid: 916
+getattr 0000003000000030 0
+getfile 0000003000000030
+getfile 0000003000000030 -> sz 31097232
+   getattr -> 31097232
+   unique: 26, success, outsize: 144
+unique: 27, opcode: LOOKUP (1), nodeid: 1, insize: 45, pid: 928
+   unique: 27, error: -2 (No such file or directory), outsize: 16
+unique: 28, opcode: MKDIR (9), nodeid: 1, insize: 53, pid: 928
+getattr 0000003000000030 0
+getfile 0000003000000030
+getfile 0000003000000030 -> sz 31097232
+   getattr -> 31097232
+   unique: 28, success, outsize: 144
+unique: 29, opcode: LOOKUP (1), nodeid: 1, insize: 46, pid: 945
+   unique: 29, error: -2 (No such file or directory), outsize: 16
+unique: 30, opcode: MKDIR (9), nodeid: 1, insize: 54, pid: 945
+getattr 0000003000000030 0
+getfile 0000003000000030
+getfile 0000003000000030 -> sz 31097232
+   getattr -> 31097232
+   unique: 30, success, outsize: 144
+fuse: failed to unmount /home/stu/devlop/lab1/yfs1: Invalid argument

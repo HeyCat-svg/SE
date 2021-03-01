@@ -1,0 +1,51 @@
+Reading 2
+518021910184 邓诗羿
+
+Q1：What are the roles that a node can have in Raft? What is the function of each role?
+A1：Raft当中包含follower、candidate和leader三种node。leader负责接收client的请求，存储log并且将log信息分发给自己的follower，最后commit完成储存
+       后对client发送respond；candidate是follower在election timeout后转变而来，负责向其他server发送vote request，如果受到majority servers的同意则变成
+       leader，期间收到其他candidates的vote request则退化为follower；follower负责接受leader的同步请求，更新本地的log，如果在election timeout后没收到
+       leader的请求，则转为candidate。
+
+Q2：What is the log for?
+A2：log记录的是server依次完成的命令，包括所在term、log index和命令内容。log用于在server crash后能够根据其内容进行recovery。同时当leader crash后，
+       新的leader能够根据log的内容对follower的本地存储进行回滚或者新增，达到follower内容始终和leader保持一致。
+
+Q3：How does a cluster of nodes elect a leader?
+A3：最开始所有的node都是follower，当follower的election timeout后，此node率先变成candidate，并且election term加一，同时向cluster中其他node发出
+       vote request，自己也算在里面。当candidate收到集群中majority of node的同意后，便从candidate变成leader。如果candidate在election timeout后没有
+       收到majority of node的同意，则把自己的election term加一，开始新的一轮选举。如果candidate在选举中途受到election term大于等于自己的candidate的
+       vote request，则退化为follower。
+
+Q4："Without a steady leader, Raft cannot make progress." Why not?
+A4：因为leader是负责接收client请求，向follwer发送同步请求。而leader crash之后就需要重新选举，在选举期间cluster是拒绝client的一切请求。如果leader频繁crash，
+       则cluster大部分的时间都花在election上了。更何况新的leader选上后还要对每个follower进行consistency check，这也需要花时间；或者MTBF大于vote request发
+       送时间，则candidate会陷入一直得不到majority of nodes的同意的境地，进而导致整个cluster瘫痪。
+
+Q5：Why is it important that at most one candidate win an election (the Election Safety Problem)?
+A5：因为leader角色的职能决定了一个cluster只能最多有一个leader。如果两个candidate同时胜选，关于log的同步就会发生混乱。所以只能有一个candidate胜选。
+
+Q6：How does Raft handle follower failures?
+A6：如果一个follower crash，则后续leader或者candidate会不停的分别发送AppendEntries PRCs和RequestVote，直到follwer server restart，并且完成respond。
+       restart后的follwer只要完成接收到的request即可。
+
+Q7：How does Raft handle candidate failures?
+A7：和Q6一样。
+
+Q8：How does Raft handle leader failures?
+A8：如果leader crash，则follower不会受到由leader定期发送的AppendEntries PRCs (Heartbeat)。在election timeout后follower没收到leader的AppendEntries PRCs，
+       则转为candidate并且将自己的elction term加一，同时向cluster中的其他node发送RequestVote。follower如果收到了election term大于自己的RequestVote，并且
+       自己log的最后一条entry是落后于candidate的记录时，则返回ACK，同时更新自己的election term；反之，则拒绝请求。candidate受到majority of nodes的ACK后，
+       转成新的leader。之后新leader用自己的log向follower发送AppendEntries PRCs，follower根据log内容回滚或者更新本地log。
+
+Q9：How does Raft handle network partitions?
+A9：当出现network partitions时，没有leader的一组node会因为election timeout产生新的candidate。因为选举需要majority of nodes的ACK，如果candidate所在的那
+       一组server数量小于一半，则选举不会成功，因此candidate永远处于原来的状态而不会更新本地的任何log。相反，如果candidate所在组server数量大于一半，则leader
+       选举成功。相应的，另外半边的leader因为同步请求不能获得majority of nodes的同意，则会超时回退成follower。因此，无论如何cluster中最终都会有一个leader。
+       network partition解除后，被隔离的follower又可以收到leader的AppendEntries PRCs，完成同步即可。
+
+Q10：At the top of 5.3, the paper says that leaders will retry AppendEntries RPCs indefinitely. Why don't they abort after a timeout?
+A10：我们假设crash是能够被修复的现象，并且在整个cluster中发生的频率较少（论文中提到一台机器通常数月才发生一次crash）。如果一个follower crash了，而leader因为
+         timeout而abort，则下次follower restart后会因为election timeout变成candidate，进而取代现有leader，而leader什么问题也没有却被替换，这不是我们想要的结果。
+         因此，leader不停发送AppendEntries RPCs保证follower重启后不会election timeout，同时也能及时更新follower的log。
+

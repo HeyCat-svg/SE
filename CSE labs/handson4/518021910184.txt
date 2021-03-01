@@ -1,0 +1,39 @@
+Q1：Use your own word to describe “end-to-end” argument.
+A1：在分布式系统的端到端设计中，底层网络（link layer）应该注重物理信号的传输，并且在此层做通信验证只能提高效率，
+       不能完全保证通信的可靠性。关于应用的高级功能如recovery、encryption、处理duplication、传输确认和重传应该放
+       在高层网络实现。
+
+Q2：Give at lease three cases that are suitable to use this principle.
+A2：1. 传输确认（Delivery guarantees）。传输确认有时指的不仅仅是信号从端到端传输完毕，而是request所包含的操作
+        有无完成，这个在低层无从知晓，只能从application layer直到并respond。
+       2. 传输加密（Secure transmission of data）。在低层加密会导致从传输用的buffer到应用层中间数据会有安全风险，
+       而放在应用层的好处在于开发者可以自己设计加密模式同时保证数据在出应用层之前已经被加密了，这样不怕被半路“截胡”。
+       3. 消息重传（Duplicate message suppression）。低层可以根据收到数据的checksum不同然后要求重传，但是一些由
+       应用自己产生的failure/retry需要另一边重传的情况不能被低层所识别，因此重传不会发生。而把重传的判断交给应用层
+       则能避免这种情况，同时应用层的重传判断也可以涵盖低层，所以可以直接放在高层。
+
+Q3：Give at lease three cases that are NOT suitable to use this principle.
+A3：1. 在link layer频繁出现传输错误的时候，全部错误都交给上层处理对于上层来说过于繁琐，此时需要低层进行中间确认，
+        过滤掉一些错误，减少上层压力。
+       2. 在一些对网络通讯质量有较高要求的场景如HTTP、FTP等文件传输协议就需要数据准确无误的传给对方。这时候将传输
+       校验交给应用层完成，削弱了modularity，因此需要在低层进行错误校验。
+       3. 在对网络通信需要极高传输速度和极小延迟时，将功能的实现放在低层实现可以减少抽象，使得数据能较快传输。
+       4. 端到端原则增加了开发者使用网络的成本。开发者需要对入网的每一个应用程序的网络进行配置和维护。
+       5. 软件中通用的服务需要在每个端都实现一遍，造成冗余。在网络核心布置一些应用共通的专有服务可以减少端的复杂度。
+       6. 端到端原则不适用于通信的第三方介入，即第三方无法得知端与端之间的通信数据以实现例如流量统计等功能。
+       7. 通讯逻辑由端实现后，不同端的实现质量会导致物理设备（一个物理设备上通常有许多端的软件）受到恶意软件的攻击。
+       这种涉及到安全的服务应该跑在网络核心。
+
+Q4：[Discussion] Consider the design of the file system based on inode (as we learn from class and the lab ). Which part(s)
+        of the design do you think can be removed? In another word, which part(s) of the design is(are) not flexible enough
+        and should be implemented by the user? (Hint: don’t be limited by the FS API.)
+A4：文件的基本API涉及到文件系统的核心逻辑，如果这个也要用户实现的话不如让他重写一个文件系统。而文件系统除了操作文件
+       的基本api外，还有一些辅助功能如日志、recovery、fscheck等操作。系统日志往往晦涩而难懂，有些用户对于recovery不做要
+       求，或者有不同的恢复等级。这个如果和基本操作打包到文件系统中则不能满足用户所有需求，用户仍然需要在高层编写recovery
+       应用程序。所以干脆从fs中剔除该部分，让用户自己实现，或者提供现成的插件供非开发者用户使用。
+       此外，文件系统可以将inode的管理交给其他开发者实现，因为不同开发者可能需要不同的inode规模和大小。
+
+Q5：[Discussion] The same question, for the OS.
+A5：以linux为例，linux分linux内核和linux发行版。在设计系统时，只需要考虑系统底层的实现，有一个能够运行、具备系统基本特
+       征的框架即可。至于OS和外围实用程序就交给其他开发者实现，这样就能够自定义出不同风格的linux发行版。所以结论是OS开发
+       只要实现核心低层功能，相关用户功能交给其他开发者自定义。
